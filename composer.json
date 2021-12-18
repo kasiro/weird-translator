@@ -1,0 +1,26 @@
+{
+  "name": "weird/translator",
+  "description": "description",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "obitel",
+      "email": "email@example.com"
+    }
+  ],
+  "require": {
+    "larapack/dd" : "1.1"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "9.5.*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Weird\\Translator\\" : "src"
+    },
+    "files": [
+      "src/Helpers/functions.php"
+    ]
+  }
+}
