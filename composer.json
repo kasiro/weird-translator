@@ -9,18 +9,12 @@
       "email": "email@example.com"
     }
   ],
-  "require": {
-    "larapack/dd" : "1.1"
-  },
-  "require-dev": {
-    "phpunit/phpunit": "9.5.*"
-  },
   "autoload": {
     "psr-4": {
       "Weird\\Translator\\" : "src"
-    },
-    "files": [
-      "src/Helpers/functions.php"
-    ]
+    }
+  },
+  "require": {
+    "larapack/dd": "^1.1"
   }
 }

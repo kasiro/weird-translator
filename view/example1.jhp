@@ -1,6 +1,24 @@
 <?php
 
+use Weird\Translator\Modules\*;
+class Main {
 
-echo 'asdasd'
+	public:
+		static string $name = '';
 
-?>
+	private:
+		$value = 'hehe';
+		static $p = 'yes';
+
+	public main(){
+
+	}
+
+	public static func(){
+
+	}
+}
+
+$main->add('text', fn() => {
+
+}, $main);

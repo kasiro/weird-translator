@@ -1,0 +1,78 @@
+<?php
+
+class Backuper {
+
+	public static backup_branch($branch, $project){
+		$pre = '/home/kasiro/Документы/jhp_backup/'.$branch.'/.git';
+		fs::clean('/home/kasiro/Документы/jhp_backup/'.$branch);
+		fs::folder_copy('/home/kasiro/Документы/projects/'.$project, '/home/kasiro/Документы/jhp_backup/'.$branch);
+		if (file_exists($pre)) {
+			fs::clean($pre);
+			fs::delete($pre);
+		}
+	}
+
+
+	public static backup($two, $folder_name){
+		if ($two == null) {
+			// backup_prepare('m', $folder_name);
+			Backuper::backup_branch(branch: 't', project: $folder_name);
+			nl 'Проект '.$folder_name.'/jhp Скопирован';
+		} else {
+			if ($two == 'res') {
+				fs::clean('/home/kasiro/Документы/projects/'.$folder_name, black_list: [
+					'.git'
+				]);
+				fs::folder_copy('/home/kasiro/Документы/jhp_backup/m', '/home/kasiro/Документы/projects/'.$folder_name);
+				nl 'Проект '.$folder_name.'/jhp Возобновлён';
+			}
+		}
+	}
+
+	public static get_branch_name($text){
+		return match($text){
+			'testphp' => 't',
+			'mphp' => 'm'
+		};
+	}
+}
+
+
+
+import 'fs';
+import 'manajer';
+
+$terminal_manager = new terminal_manager('backup', $argv, create_json_file: false);
+$terminal_manager->on('jhp', fn($module_name, $manager_json, $json_file, $my_args) => {
+	nl $module_name;
+});
+$who = @$argv[1];
+$two = @$argv[2];
+// switch ($who) {
+// 	case 'jhp':
+// 		$folderName = 'testphp';
+// 		$branch = Backuper::get_branch_name($folderName);
+// 		if ($branch){
+// 			Backuper::backup($two, $branch, $folderName);
+// 		}
+// 		break;
+	
+// 	case 'mphp':
+// 		$folderName = $who;
+// 		$branch = Backuper::get_branch_name($folderName);
+// 		if ($branch){
+// 			Backuper::backup($two, $branch, $folderName);
+// 		}
+// 		break;
+	
+// 	case '-h':
+// 	case '--help':
+// 		nl 'commands_1: [jhp], [-h], [--help]';
+// 		nl 'commands_2: [res]';
+// 		break;
+
+// 	default:
+// 		nl "Аргумент \"$who\" не найден";
+// 		nl 'Попробуйте другую команду';
+// 		break;
+// }

@@ -1,5 +1,11 @@
 {
-  "modules": [
-    "fn"
-  ]
+	"modules": {
+		"fn": {},
+		"import": {},
+		"jsclass": {},
+		"quantifers": {},
+		"use": {
+			"muxuse": false
+		}
+	}
 }

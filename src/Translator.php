@@ -8,35 +8,28 @@ final class Translator
 	private Render $render;
 
 	private string $filePath;
-	private bool $overwrite = true;
 
-	public function __construct()
-	{
+	public function __construct() {
 		$this->config = new Config();
 		$this->render = new Render();
+		$this->render->config = &$this->config;
 	}
 
-	public function render(string $filePath): string
-	{
+	public function render(string $filePath): string {
 		$this->setPath($filePath);
 		$this->config->initModules($this->filePath);
 
 		$modules = $this->config->getModules();
+
 		$content = $this->render->render($this->filePath, $modules);
 
 		return $this->saveFile($content);
 	}
 
-	private function saveFile(string $content): string
-	{
+	private function saveFile(string $content): string {
 		$pathInfo = pathinfo($this->filePath);
 
-		$outFilePath = $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '.php';
-
-		if (!$this->overwrite && file_exists($outFilePath)) {
-			throw new \DomainException('File "' . $outFilePath . '" exists and overwrite off');
-		}
-
+		$outFilePath = $pathInfo['dirname'] . DIRECTORY_SEPARATOR . $pathInfo['filename'] . '.php';
 
 		file_put_contents($outFilePath, $content);
 
@@ -44,8 +37,17 @@ final class Translator
 	}
 
 
-	public function setPath(string $filePath): void
-	{
-		$this->filePath = ROOT . '/' . $filePath;
+	public function setPath(string $filePath): void {
+		$this->filePath = '';
+		if (!str_contains($filePath, ROOT)){
+			$temp = ROOT . '/' . $filePath;
+		} else {
+			$temp = $filePath;
+		}
+		if (str_contains($temp, '//')){
+			$this->filePath = $filePath;
+		} else {
+			$this->filePath = $temp;
+		}
 	}
 }

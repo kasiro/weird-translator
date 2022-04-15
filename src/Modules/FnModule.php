@@ -2,18 +2,16 @@
 
 namespace Weird\Translator\Modules;
 
+use Weird\Translator\Contracts\ModuleExtends;
 use Weird\Translator\Contracts\ModuleInterface;
 
-final class FnModule implements ModuleInterface
-{
-	/**
-	 * Тут мы обрабатываем файл который нам дан и возвращаем в обработанном ввиде, и так этот файл пройдет по модулям
-	 * обрабатываясь и в конце возвращает результат
-	*/
-	public function process(string $content): string
-	{
-		$content = $content . PHP_EOL. '< Тут сработал модуль fn >';
+final class FnModule extends ModuleExtends implements ModuleInterface {
 
+	public function process(string $content): string {
+		$content = preg_replace('/^([^\/\/].*|)fn((?<!\')(?<!\"))\((.*|)\) use \((\$.*)\) => {/m', '$1function ($3) use ($4) {', $content);
+		$content = preg_replace('/^([^\/\/].+)(\$.*)[[:>:]] => {/m', '$1function ($2) {', $content);
+		$content = preg_replace('/^([^\/\/].*|)fn\((.*|)\) => {/m', '$1function ($2) {', $content);
 		return $content;
 	}
+
 }

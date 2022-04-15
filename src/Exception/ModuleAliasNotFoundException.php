@@ -9,7 +9,6 @@ final class ModuleAliasNotFoundException extends \Exception
 	public function __construct(string $name, $code = 0, \Throwable $previous = null)
 	{
 		parent::__construct('Alias not found', $code, $previous);
-
 		$this->name = $name;
 	}
 
