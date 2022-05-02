@@ -1,23 +1,30 @@
 <?php
 
-use Weird\Translator\Modules\FnModule;
-use Weird\Translator\Modules\ImportModule;
-use Weird\Translator\Modules\JsClassModule;
-use Weird\Translator\Modules\QuantifersModule;
-use Weird\Translator\Modules\UseModule;
+/**
+ * @jhpdoc
+ */
 
+
+
+use Weird\Translator\Modules\*;
 class Main {
 
-	public static string $name = '';
+	public static string $name = 'Vasya';
 	private $value = 'hehe';
 	private static $p = 'yes';
 
-	public function main(){
-
+	public function add(){
+		$name = @'Danya' ? 'Danya' : (
+			@$mate ? $mate : null
+		);
 	}
 
 	public static function func(){
-
+		enum sec: string {
+			case black = 'black';
+			case dark_gray = 'dark_gray';
+			case blue = 'blue';
+		}
 	}
 }
 

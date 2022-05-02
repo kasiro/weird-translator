@@ -7,6 +7,9 @@ switch ($requireMethod) {
 		return [
 			'fn' => Weird\Translator\Modules\FnModule::class,
 			'import' => Weird\Translator\Modules\ImportModule::class,
+			'jsClass' => Weird\Translator\Modules\JsClassModule::class,
+			'quantifers' => Weird\Translator\Modules\QuantifersModule::class,
+			'use' => Weird\Translator\Modules\UseModule::class,
 		];
 	
 	case 'auto':

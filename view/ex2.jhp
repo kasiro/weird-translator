@@ -30,7 +30,7 @@ class Backuper {
 	}
 
 	public static get_branch_name($text){
-		return match($text){
+		return match ($text) {
 			'testphp' => 't',
 			'mphp' => 'm'
 		};

@@ -6,10 +6,13 @@ use Weird\Translator\Config;
 use Weird\Translator\Contracts\ModuleExtends;
 use Weird\Translator\Contracts\ModuleInterface;
 
+use function PHPUnit\Framework\returnSelf;
+
 final class UseModule extends ModuleExtends implements ModuleInterface {
 
 	public function process(string $content): string {
 		$loader = $GLOBALS['loader'];
+		$this->log(__CLASS__, 'loader -> '.(is_object($loader) ? 'true' : 'false'));
 		foreach ($loader->getPrefixesPsr4() as $key => $array){
 			$prefix = $key;
 			$v = $array[0];
@@ -17,6 +20,8 @@ final class UseModule extends ModuleExtends implements ModuleInterface {
 		}
 		
 		$settings = $this->getSettings()['muxuse'];
+		$settings = true;
+		$this->log(__CLASS__, 'settings -> '.(is_array($settings) ? 'true' : 'false'));
 		$content = match ($settings){
 			true => preg_replace_callback('/^use (.*);$/m', function ($matches) use ($prefix, $v) {
 				$namespace = $matches[1];
@@ -42,7 +47,7 @@ final class UseModule extends ModuleExtends implements ModuleInterface {
 					}
 					$s .= '}';
 					$newNamespace = str_replace('*', $s, $matches[0]);
-				}
+				} else return $matches[0];
 				// dd($matches[0], $newNamespace, $s);
 				return $newNamespace;
 			}, $content),
@@ -62,7 +67,7 @@ final class UseModule extends ModuleExtends implements ModuleInterface {
 						$newNamespace = str_replace('*', '', $namespace);
 						$s .= 'use '.$newNamespace.$className.';'.PHP_EOL;
 					}
-				}
+				} else return $matches[0];
 				return $s;
 			}, $content)
 		};

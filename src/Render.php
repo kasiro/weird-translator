@@ -19,8 +19,12 @@ final class Render {
 		*/
 		foreach ($modules as $key => $module) {
 			// FIXME: тут у нас будет проблема, если конструктору нужны параметры
-			$module = new $module();
+			// dd($module);
 
+			$module = new $module();
+			/**
+			 * @var object $module
+			*/
 			// Тут мы будем настраивать модули
 			$strModule = get_class($module);
 			$modName = @end(explode('\\', $strModule));
@@ -28,16 +32,19 @@ final class Render {
 				'Module' => ''
 			]);
 			$modName = strtolower($modName);
-			if (!$this->config->findConfigFile()){
+			if ($this->config->findConfigFile($filePath)){
+				$settings = $this->config->getModuleSettings($modName);
 				$module->setSettings(
-					$this->config->getModuleSettings($modName)
+					$settings
 				);
+				// Доступа нету
+				//! Есть Ошибка
+				//* dump($module->getSettings());
 			} else {
 				$module->setSettings(
 					$this->config->getDefaultModuleSettings($modName)
 				);
 			}
-
 			if (!($module instanceof ModuleInterface)) {
 				throw new \RuntimeException('The module "'.get_class($module).'" don"t extended from ModuleInterface');
 			}

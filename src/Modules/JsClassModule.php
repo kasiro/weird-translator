@@ -12,12 +12,7 @@ final class JsClassModule extends ModuleExtends implements ModuleInterface {
 	}
 
 	public function findType($sym){
-		$ops = [
-			'int',
-			'string',
-			'bool',
-			'array'
-		];
+		$ops = require __DIR__.'/types/types.php';
 		$find = false;
 		foreach ($ops as $el){
 			if (in_array($el, $sym)) {

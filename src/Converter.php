@@ -2,7 +2,7 @@
 
 namespace Weird\Translator;
 
-class converter {
+class Converter {
 
 	public static function convertArrayToObject($array){
 		foreach ($array as $key => $value) {

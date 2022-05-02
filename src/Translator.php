@@ -20,7 +20,6 @@ final class Translator
 		$this->config->initModules($this->filePath);
 
 		$modules = $this->config->getModules();
-
 		$content = $this->render->render($this->filePath, $modules);
 
 		return $this->saveFile($content);
@@ -28,11 +27,8 @@ final class Translator
 
 	private function saveFile(string $content): string {
 		$pathInfo = pathinfo($this->filePath);
-
 		$outFilePath = $pathInfo['dirname'] . DIRECTORY_SEPARATOR . $pathInfo['filename'] . '.php';
-
 		file_put_contents($outFilePath, $content);
-
 		return $outFilePath;
 	}
 

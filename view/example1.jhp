@@ -1,21 +1,27 @@
 <?php
 
+/**
+ * @jhpdoc
+ */
+
+import 'Colors';
+
 use Weird\Translator\Modules\*;
 class Main {
 
 	public:
-		static string $name = '';
+		static string $name = 'Vasya';
 
 	private:
 		$value = 'hehe';
 		static $p = 'yes';
 
-	public main(){
-
+	public add(){
+		$name = 'Danya' | $mate;
 	}
 
 	public static func(){
-
+		enum sec: string -> {'black', 'dark_gray', 'blue'};
 	}
 }
 
