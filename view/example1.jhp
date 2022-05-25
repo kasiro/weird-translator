@@ -1,7 +1,15 @@
 <?php
-
 /**
- * @jhpdoc
+ *? @status parse
+ ** @module CommentsModule {}
+ ** @module EnumModule {}
+ ** @module FnModule {}
+ ** @module ImportModule {}
+ ** @module JsClassModule {}
+ ** @module JsElseModule {}
+ ** @module NewLineModule {}
+ ** @module QuantifersModule {}
+ ** @module UseModule {muxuse => false}
  */
 
 import 'Colors';
@@ -21,7 +29,7 @@ class Main {
 	}
 
 	public static func(){
-		enum sec: string -> {'black', 'dark_gray', 'blue'};
+		enum fcolors: string -> {'black', 'dark_gray', 'blue'};
 	}
 }
 

@@ -11,34 +11,95 @@ use Weird\Translator\Exception\ModuleAliasNotFoundException;
 final class Config {
 	private $configExtension = '.config';
 
+	/**
+	 * @var string $filePath - путь до обрабатываемого файла
+	 */
 	private string $filePath;
 	private array $modules = [];
 
-	public function initModules(string $filePath): void 
-	{
+	public function initModules(string $filePath): void {
 		$this->filePath = $filePath;
-		$text = '';
-		// $text = file_get_contents($filePath);
-		if (str_contains($text, '\/\*\*\n \* @jhpdoc\n \*\/')){
-			$modulesDoc = $this->getModulesDoc();
-		} else {
-			$jsonPath = $this->findConfigFile($filePath);
-			// Если не нашли конфиг-файл в этой директории, то мы устанавливаем поумолчанию
-			if (!$jsonPath) {
-				$this->defaultModules();
-				return;
+		$file = file_get_contents($filePath);
+		$strr = '#\/\*\*\n \* @jhpdoc\n \*\/#m';
+		$hasDocParse = (bool) preg_match('#\/\*\*\n \*\? @status parse(.*?)\*\/#ms', $file, $matches);
+		$hasDockBlock = (bool) preg_match($strr, $file);
+		dump('[hasDocBlok]: '.($hasDockBlock ? 'true' : 'false'));
+		dump('[hasDocParse]: '.($hasDocParse ? 'true' : 'false'));
+		// Тут идет проверка есть ли в файле блок-комментарий
+		if (!$hasDockBlock){
+			if (!$hasDocParse) {
+				$jsonPath = $this->findConfigFile($filePath);
+				if (!$jsonPath) {
+					$this->defaultModules();
+					return;
+				}
+				$this->configureJsonFile($jsonPath);
+			} else {
+				//* Парсим DocBlock
+				//* Настраиваем модули
+				$dockBlock = $matches[1];
+				// dd($dockBlock);
+				$this->configureDockBlock($dockBlock);
 			}
-			$this->configureJsonFile($jsonPath);
+		} else {
+			$this->defaultModules();
+			$this->replaceDoc();
 		}
 	}
 
-	public function getModulesDoc() {
-		$modules = $this->getModules();
-		$strr = '\/\*\*\n \* @jhpdoc\n \*\/';
-		dd($module);
+	public function getAliasName($moduleName){
+		return strtolower(strtr($moduleName, ['Module' => '']));
+	}
+
+	public function configureDockBlock($dockBlock){
+		$modules = [];
+		preg_match_all('#@module (.*) {(.*)}#m', $dockBlock, $matches);
+		for ($i = 0; $i < count($matches[1]); $i++) { 
+			$moduleName = $matches[1][$i];
+			$moduleSettings = $matches[2][$i];
+			$m = $this->getAliasName($moduleName);
+			if ($moduleSettings == ''){
+				//! Модули не определены
+				// $moduleSettings = $this->getDefaultModuleSettings($m);
+			}
+			$modules[$m] = $moduleSettings;
+		}
+		dd($modules);
+	}
+
+	public function replaceDoc() {
+		$strr = '#\/\*\*\n \* @jhpdoc\n \*\/#m';
+		$modules = array_map(
+			fn($m) => @end(explode('\\', $m)),
+			$this->getModules()
+		);
 		$str = '/**' . PHP_EOL;
-		$str .= ' * @';
-		return '';
+		$str .= ' *? @status parse'.PHP_EOL;
+		foreach ($modules as $module){
+			$m = $this->getAliasName($module);
+			$module_settings = $this->getDefaultModuleSettings($m);
+			$settings = [];
+			if (count($module_settings) > 1){
+				$i = 0;
+				foreach ($module_settings as $el){
+					$key = array_keys($module_settings)[$i];
+					$value = array_values($module_settings)[$i];
+					if (is_bool($value)) $value = $value ? 'true' : 'false';
+					$settings[] = $key.' => '.$value;
+					$i++;
+				}
+			} elseif (!empty($module_settings)) {
+				$key = array_key_first($module_settings);
+				$value = array_values($module_settings)[0];
+				if (is_bool($value)) $value = $value ? 'true' : 'false';
+				$settings[] = $key.' => '.$value;
+			}
+			$str .= ' ** @module '.$module.' {'.implode(', ', $settings).'}'.PHP_EOL;
+		}
+		$str .= ' */';
+		$text = file_get_contents($this->filePath);
+		$text = preg_replace($strr, $str, $text);
+		file_put_contents($this->filePath, $text);
 	}
 
 	/**
@@ -106,8 +167,7 @@ final class Config {
 		return [];
 	}
 
-	public static function convertObjectToArray($object)
-	{
+	public static function convertObjectToArray($object) {
 		$new = [];
 		foreach ((array)$object as $key => $value) {
 			if (is_object($value)) $new[$key] = static::convertObjectToArray($value);
@@ -116,23 +176,27 @@ final class Config {
 		return (array) $new;
 	}
 
-	public function getDefaultModuleSettings($moduleName = '', $getAll = false) 
-	{
+	public function getDefaultModuleSettings($moduleName = '', $getAll = false) {
 		$modules = $this->getModules();
-		dd($modules);
-		$defaultSettings = [
-			'fn' => new stdClass,
-			'import' => new stdClass,
-			'jsclass' => new stdClass,
-			'quantifers' => new stdClass,
+		$std = new stdClass;
+		$userSettings = [
 			'use' => [
 				"muxuse" => false
 			]
 		];
+		$files = glob(__DIR__.'/Modules/*.php');
+		$defaultSettings = [];
+		foreach ($files as $modPath) {
+			$modPath = basename(explode('.', $modPath)[0]);
+			$defaultSettings[$this->getAliasName($modPath)] = $std;
+		}
+		$defaultSettings = [...$defaultSettings, ...$userSettings];
 		if ($getAll) return $defaultSettings;
-		dd(class_exists('Converter'));
-		$defaultSettings = Converter::convertObjectToArray($defaultSettings);
-		return isset($defaultSettings[$moduleName]) ? $defaultSettings[$moduleName] : [];
+		// $defaultSettings = static::convertObjectToArray($defaultSettings);
+		if (isset($defaultSettings[$moduleName])){
+			return static::convertObjectToArray($defaultSettings[$moduleName]);
+		}
+		return [];
 	}
 
 	public function createDefaultConfig($filepath){
@@ -142,11 +206,12 @@ final class Config {
 		file_put_contents($filepath, $json_sett);
 	}
 
-	private function defaultModules(): void 
-	{
-		$this->modules = [
-			FnModule::class
-		];
+	private function defaultModules(): void {
+		$files = glob(__DIR__.'/Modules/*.php');
+		foreach ($files as $modPath) {
+			$name = explode('.', basename($modPath))[0];
+			$this->modules[] = 'Weird\Translator\Modules\\'.$name;
+		}
 	}
 
 	public function getModules(): array {

@@ -1,7 +1,15 @@
 <?php
-
 /**
- * @jhpdoc
+ *? @status parse
+ ** @module CommentsModule {}
+ ** @module EnumModule {}
+ ** @module FnModule {}
+ ** @module ImportModule {}
+ ** @module JsClassModule {}
+ ** @module JsElseModule {}
+ ** @module NewLineModule {}
+ ** @module QuantifersModule {}
+ ** @module UseModule {muxuse => false}
  */
 
 
@@ -20,7 +28,7 @@ class Main {
 	}
 
 	public static function func(){
-		enum sec: string {
+		enum fcolors: string {
 			case black = 'black';
 			case dark_gray = 'dark_gray';
 			case blue = 'blue';

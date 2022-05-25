@@ -15,6 +15,9 @@ final class Translator
 		$this->render->config = &$this->config;
 	}
 
+	/**
+	 * @param string $filePath - Путь до обрабатываемого jhp-файла
+	 * */
 	public function render(string $filePath): string {
 		$this->setPath($filePath);
 		$this->config->initModules($this->filePath);

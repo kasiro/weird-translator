@@ -1,26 +1,19 @@
 <?php
 
+use Weird\Translator\Config;
+use Weird\Translator\TranslatorFactory;
+
 # Сделать @JhpDocBlock
 # убрать Loader из GLOBALS
 # Перенести модули
 
+
+
 $loader = require_once 'vendor/autoload.php';
 
-use Weird\Translator\TranslatorFactory;
+// dd($argv);
 
-define('ROOT', __DIR__);
-
-$req = [
-	'terminal_manager',
-	'Colors',
-	'arr'
-];
-array_map(
-	fn($f) => require __DIR__.'/req/'.$f.'.php',
-	array: $req
-);
-
-$manager = new terminal_manager('jhp', $argv, false);
+$manager = new terminal_manager('jhp', $argv, false, false);
 
 $manager->get_help_list = function () use ($manager) {
 	$commands = array_merge($manager->command_list, $manager->on_list);
@@ -30,6 +23,7 @@ $manager->get_help_list = function () use ($manager) {
 	];
 	return [$commands, $options];
 };
+
 
 $manager->stabilize = function (string $pattern, $names, $spaces = 1) use ($manager) {
 	$List = [];
@@ -92,15 +86,27 @@ $manager->stabilize = function (string $pattern, $names, $spaces = 1) use ($mana
 	return $List;
 };
 
-$manager->command('init', function ($two_arg) {
-	echo Colors::setColor('init', 'cyan') . ' config...' . PHP_EOL;
+$manager->command('init', function ($path_to_file) use ($argv) {
+	echo Colors::setColor('init', 'cyan') . ' data...' . PHP_EOL;
+	if (strlen($path_to_file) == 0) $path_to_file = 'view/example1.jhp';
+	else $path_to_file = @$argv[3];
+	if ($path_to_file !== null){
+		$Config = new Config();
+		$Config->initModules($argv[1].'/'.$path_to_file);
+	}
 })->setDescription('init', 'init config for folder');
 
-$manager->command('run', function ($path_to_file) {
+$manager->command('run', function ($path_to_file) use ($argv) {
 	if (strlen($path_to_file) == 0) $path_to_file = 'view/example1.jhp';
-	echo Colors::setColor('handling...', 'cyan') . ' "'.Colors::setColor($path_to_file, 'green').'"' . PHP_EOL;
-	$translator = TranslatorFactory::make();
-	$translator->render($path_to_file);
+	else $path_to_file = @$argv[3];
+	if ($path_to_file !== null){
+		echo Colors::colorize('%handling... %"'.$path_to_file.'"', [
+			'handling..' => 'cyan',
+			'"'.$path_to_file.'"' => 'green'
+		]) . PHP_EOL;
+		$translator = TranslatorFactory::make();
+		$translator->render($path_to_file);
+	}
 })->setDescription('run', 'run project compile');
 
 $manager->command(['-h', '--help'], function ($module_name, $json, $json_path) use (&$manager) {
@@ -130,6 +136,8 @@ $manager->command(['-h', '--help'], function ($module_name, $json, $json_path) u
 	}
 });
 
+
+// Можно убирать
 $manager->other(function ($manager_name, $args) use ($manager) {
 	if (count($args) > 1){
 		$command = $manager_name.' '.implode(' ', $args);
@@ -147,6 +155,7 @@ $manager->other(function ($manager_name, $args) use ($manager) {
 	$option_found = false;
 	$current_options = [];
 	for ($i = 1; $i <= count($args); $i++){
+		if (!isset($args[$i])) break;
 		$option = $args[$i];
 		if (str_starts_with($option, '-') && in_array($option, $options)){
 			$option_found = true;

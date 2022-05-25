@@ -1,32 +1,38 @@
 {
-    "name": "weird/translator",
-    "description": "description",
-    "minimum-stability": "stable",
-    "license": "proprietary",
-    "authors": [
-        {
-            "name": "obitel",
-            "email": "email@example.com"
-        }
-    ],
-    "scripts": {
-        "test": "./vendor/bin/pest",
-        "initt": "./vendor/bin/pest --init"
-    },
-    "autoload": {
-        "psr-4": {
-            "Weird\\Translator\\": "src"
-        }
-    },
-    "require": {
-        "larapack/dd": "^1.1"
-    },
-    "config": {
-        "allow-plugins": {
-            "pestphp/pest-plugin": true
-        }
-    },
-    "require-dev": {
-        "pestphp/pest": "^1.21"
-    }
+	"name": "weird/translator",
+	"description": "description",
+	"minimum-stability": "stable",
+	"license": "proprietary",
+	"authors": [
+		{
+			"name": "obitel",
+			"email": "email@example.com"
+		}
+	],
+	"scripts": {
+		"test": "./vendor/bin/pest",
+		"initt": "./vendor/bin/pest --init"
+	},
+	"autoload": {
+		"psr-4": {
+			"Weird\\Translator\\": "src"
+		},
+		"classmap": [
+		 	"./helpers/"
+		],
+		"files" : [
+			"preloader.php"
+		]
+	},
+	"require": {
+		"larapack/dd": "^1.1"
+	},
+	"config": {
+		"allow-plugins": {
+			"pestphp/pest-plugin": true
+		}
+	},
+	"require-dev": {
+		"pestphp/pest": "^1.21"
+	}
 }

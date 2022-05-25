@@ -13,6 +13,9 @@ class terminal_manager {
 		$this->name = $name;
 		$this->args = $args;
 		$this->create_json_file = $create_json_file;
+		if ($create_json_file) {
+			$this->manager_json = $this->get_json();
+		}
 	}
 
 	public function registerMethod($name, $callback){
@@ -31,15 +34,14 @@ class terminal_manager {
 	}
 
 	public function command(string|array $command_name, callable $func){
-		$first = @$this->args[1] ?? '';
+		$first = @$this->args[2] ?? '';
 		$my_args = [];
-		for ($i = 2; $i <= count($this->args); $i++) { 
+		for ($i = 1; $i < count($this->args); $i++) { 
 			$my_args[] = $this->args[$i];
 		}
 		$command = $this->name.' '.implode(' ', $this->args);
-		$this->manager_json = $this->get_json();
 		$module_name = '';
-		for ($i = 2; $i <= count($this->args); $i++){
+		for ($i = 3; $i < count($this->args); $i++){
 			if (!str_starts_with($this->args[$i], '-')){
 				$module_name = $this->args[$i];
 				break;
@@ -95,15 +97,14 @@ class terminal_manager {
 	}
 
 	public function on(string|array $command_name, callable $func){
-		$first = @$this->args[1] ?? '';
+		$first = @$this->args[2] ?? '';
 		$my_args = [];
-		for ($i = 2; $i < count($this->args); $i++) { 
+		for ($i = 1; $i < count($this->args); $i++) { 
 			$my_args[] = $this->args[$i];
 		}
 		$command = $this->name.' '.implode(' ', $this->args);
-		$this->manager_json = $this->get_json();
 		$module_name = '';
-		for ($i = 2; $i <= count($this->args); $i++){
+		for ($i = 3; $i < count($this->args); $i++){
 			if (!str_starts_with($this->args[$i], '-')){
 				$module_name = $this->args[$i];
 				break;
@@ -139,7 +140,7 @@ class terminal_manager {
 	}
 
 	public function other(callable $func){
-		$command_name = @$this->args[1] ?? '';
+		$command_name = @$this->args[2] ?? '';
 		$command = $this->name.' '.implode(' ', $this->args);
 		if (!in_array($command_name, $this->on_list) && !in_array($command_name, $this->command_list)){
 			$res = $func($this->name, $this->args);
